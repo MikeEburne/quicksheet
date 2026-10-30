@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Quick Sheet</title>
+  <script src="https://officeapis.public.onecdn.static.microsoft/1/office.js"></script>
+  <script src="quicksheet.js"></script>
+  <style>
+    :root { --blue: #4682b4; --text: #1f1f1f; --muted: #616161; --bg: #fff; --border: #e1e4e8; --ok: #107c10; --err: #c50f1f; }
+    @media (prefers-color-scheme: dark) {
+      :root { --text: #f0f0f0; --muted: #b0b0b0; --bg: #1f1f1f; --border: #3b3b3b; --blue: #6fa8d6; --ok: #54b054; --err: #ff6b6b; }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 16px; font-family: "Segoe UI", -apple-system, Roboto, sans-serif; font-size: 14px; color: var(--text); background: var(--bg); }
+    h1 { font-size: 18px; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+    p { color: var(--muted); margin: 0 0 16px; }
+    label { display: block; font-weight: 600; font-size: 12px; margin-bottom: 4px; }
+    input { width: 100%; padding: 7px 8px; font: inherit; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); color: var(--text); }
+    button { margin-top: 12px; width: 100%; padding: 8px; font: inherit; color: #fff; background: var(--blue); border: none; border-radius: 4px; cursor: pointer; }
+    button:disabled { opacity: .5; }
+    #msg { margin-top: 12px; min-height: 20px; }
+    .ok { color: var(--ok); } .err { color: var(--err); }
+  </style>
+</head>
+<body>
+  <h1><img src="assets/icon-32.png" width="24" height="24" alt="" /> Quick Sheet</h1>
+  <p>Add a new, named worksheet to this workbook in one click.</p>
+
+  <label for="name">Sheet name</label>
+  <input id="name" type="text" maxlength="31" placeholder="New Sheet" />
+  <button id="create" disabled>Create sheet</button>
+  <div id="msg" role="status"></div>
+
+  <script>
+    Office.onReady(function (info) {
+      if (info.host !== Office.HostType.Excel) return;
+      var btn = document.getElementById("create");
+      var input = document.getElementById("name");
+      var msg = document.getElementById("msg");
+      btn.disabled = false;
+
+      async function run() {
+        btn.disabled = true;
+        msg.className = "";
+        msg.textContent = "Creating…";
+        try {
+          var name = await createSheet(input.value);
+          msg.className = "ok";
+          msg.textContent = "Added sheet “" + name + "”.";
+          input.value = "";
+        } catch (e) {
+          msg.className = "err";
+          msg.textContent = "Could not add the sheet: " + (e && e.message ? e.message : e);
+        } finally {
+          btn.disabled = false;
+        }
+      }
+      btn.addEventListener("click", run);
+      input.addEventListener("keydown", function (e) { if (e.key === "Enter") run(); });
+    });
+  </script>
+</body>
+</html>

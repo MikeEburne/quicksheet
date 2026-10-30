@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Quick Sheet commands</title>
+  <script src="https://officeapis.public.onecdn.static.microsoft/1/office.js"></script>
+  <script src="quicksheet.js"></script>
+  <script>
+    // Ribbon button "New Sheet" runs this directly, no task pane needed.
+    Office.onReady(function () {
+      Office.actions.associate("createSheetFromRibbon", async function (event) {
+        try {
+          await createSheet("New Sheet");
+        } catch (e) {
+          console.error(e);
+        } finally {
+          event.completed();
+        }
+      });
+    });
+  </script>
+</head>
+<body></body>
+</html>
